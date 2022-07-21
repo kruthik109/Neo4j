@@ -1,0 +1,63 @@
+CREATE (a1:Author{name: 'Gorman, Michael'}),(a2:Author{name: 'Toner, Patrick'}),(a3:Author{name: 'Koslicki, Kathrin'}),(a4:Author{name: 'Fine, Kit'}),(a5:Author{name: 'Feser, Edward'});
+ 
+CREATE (g1:Article{title: 'Ontological Dependence'}),(g2:Article{title: 'Independence and Substance'}),(g3:Article{title: 'Independence Accounts of Substance and Substantial Parts'}),(g4:Article{title: 'Substance and Identity-Dependence'}),(g5:Article{title: 'On Substantial Independence: a Reply to Patrick Toner'});
+ 
+CREATE (ab:Chapter{no: 9,title: 'Substance, Independence, and Unity'});
+ 
+CREATE (ab:Issue{issue: 1,month: 8,volume:155,year:2011}),
+(abcd:Issue{issue: 1,month: 3,volume:35,year:2006}),(abcde:Issue{volume:95,year:1995}),(abcdf:Issue{issue: 2,month: 6,volume:159,year:2012}),(abg:Issue{issue: 2,month: 6,volume:46,year:2006});
+ 
+CREATE (b1: Journal{ISSN:'0556-8641',onlineISSN:'1996-8523',title:'Philosophical Papers' }),(b2: Journal{ISSN:'0031-8116',onlineISSN:'1573-0883',title:'Philosophical Studies' }),(b3: Journal{ISSN:'0066-7374',onlineISSN:'1467-9264'
+,title:'Proceedings of the Aristotelian Society'}),(b4: Journal{ISSN:'0019-0365',onlineISSN:'2153-8077'
+,title:'International Philosophical Quarterly'});
+ 
+CREATE(c1:Book{ISBN_10:'0230360912',ISBN_13:'978-0230360914', month:7, title:'Aristotle on Method and Metaphysics',year:2013});
+ 
+CREATE(d1:Publisher{location:"London", name:'Palgrave Macmillan'});
+ 
+CREATE(e1:Player{name:'James Harden'}),(e2:Player{name:'russell westbrook'}),(e3:Player{name:'Lebron James'});
+
+CREATE (f1:Team{name:'Cleveland Cavaliers'}), (f2:Team{name:'Oklahoma City Thunder'}),(f3:Team{name:' Houston Rockets'});
+
+
+
+MATCH (a:Author),(b:Article) WHERE a.name = 'Fine, Kit' and b.title='Ontological Dependence' CREATE (a)-[:WRITES]->(b) ;
+
+MATCH (a:Author),(b:Book) WHERE a.name = 'Feser, Edward' and b.title='Aristotle on Method and Metaphysics' CREATE (a)-[:EDITS]->(b) ;
+
+MATCH (a:Author),(b:Chapter) WHERE a.name = 'Koslicki, Kathrin' and b.title='Substance, Independence, and Unity' CREATE (a)-[:WRITES]->(b) ;
+
+MATCH (a:Author),(b:Article),(c:Article) WHERE a.name = 'Gorman, Michael' and b.title=' Substance and Identity-Dependence' AND c.title ='On Substantial Independence: a Reply to Patrick Toner' CREATE (c)<-[:WRITES]-(a)-[:WRITES]->(b);
+
+MATCH (a:Publisher),(b:Book) WHERE a.name = 'Palgrave Macmillan' and b.title='Aristotle on Method and Metaphysics' CREATE (a)-[:PUBLISHED_BY]->(b) ;
+
+MATCH (a:Chapter),(b:Book),(c:Author) WHERE a.title= 'Substance, Independence, and Unity' and b.title='Aristotle on Method and Metaphysics' and c.name='Koslicki, Kathrin' CREATE (c)-[:WRITES]-> (a)-[:IN{pp:[169,195]}]->(b) ;
+
+MATCH (a:Chapter),(b:Article),(c:Article) WHERE a.title= 'Substance, Independence, and Unity' and b.title='On Substantial Independence: a Reply to Patrick Toner' and c.title='Independence and Substance' CREATE (c)<-[:CITES]-(a)-[:CITES]->(b) ;
+
+MATCH (a:Issue),(b:Journal),(c:Article) WHERE a.volume= 35 and b.title='Philosophical Papers' and c.title='Substance and Identity-Dependence' CREATE (b)<-[:OF]-(a)<-[:IN{pp:[103,118]}]-(c) ;
+
+MATCH (a:Author),(b:Article),(c:Article) WHERE a.name= 'Gorman, Michael' and b.title='On Substantial Independence: a Reply to Patrick Toner' and c.title='Substance and Identity-Dependence' CREATE (b)-[:CITES]->(c)<-[:WRITES]-(a);
+
+MATCH (a:Author),(b:Article),(c:Article) WHERE a.name= 'Gorman, Michael' and b.title='On Substantial Independence: a Reply to Patrick Toner' and c.title='Independence and Substance' CREATE (b)<-[:WRITES]-(a)-[:WRITES]->(c);
+
+MATCH (a:Issue),(b:Article),(c:Article) WHERE a.volume= 46 and b.title='Independence Accounts of Substance and Substantial Parts' and c.title='Independence and Substance' CREATE (b)-[:CITES]->(c)-[:IN {pp:[147,159]}]->(a);
+
+MATCH (a:Issue),(b:Journal) WHERE a.volume= 46 and b.title= 'International Philosophical Quarterly' CREATE (b)<-[:OF]-(a);
+
+MATCH (a:Article),(b:Article) WHERE a.title= 'Substance and Identity-Dependence' and b.title= 'Independence Accounts of Substance and Substantial Parts' CREATE (a)<-[:CITES]-(b);
+
+MATCH (a:Article),(b:Article),(c:Issue) WHERE a.title='On Substantial Independence: a Reply to Patrick Toner' and b.title= 'Independence Accounts of Substance and Substantial Parts' and c.volume =159 CREATE (b)<-[:CITES]-(a)- [:IN{pp:[239,297]}]->(c);
+
+MATCH (a:Journal),(b:Article),(c:Issue) WHERE a.title='Proceedings of the Aristotelian Society' and b.title= 'Ontological Dependence' and c.volume =95 CREATE (a)<-[:OF]-(c)<-[:IN{pp:[269,290]}]-(b);
+
+
+MATCH (a:Article),(b:Article) WHERE a.title='Ontological Dependence' and b.title= 'Independence and Substance' CREATE (a)<-[:CITES]-(b);
+
+MATCH (a:Article),(b:Journal), (c:Issue) WHERE a.title='Independence Accounts of Substance and Substantial Parts' and b.title= 'Philosophical Studies' and c.volume =155 CREATE (a)-[:IN{pp:[37,43]}]->(c)-[:OF]->(b);
+
+MATCH (b:Journal), (c:Issue) WHERE b.title= 'Philosophical Studies' and c.volume =159 CREATE (c)-[:OF]->(b);
+
+MATCH (b:Chapter), (c:Article) WHERE b.title='Substance, Independence, and Unity' and c.title ='Independence Accounts of Substance and Substantial Parts' CREATE (b)-[:CITES]->(c);
+
+MATCH (b:Author), (c:Article) WHERE b.name='Toner, Patrick' and c.title ='Independence Accounts of Substance and Substantial Parts' CREATE (b)-[:WRITES]->(c);
